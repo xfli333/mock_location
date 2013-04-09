@@ -15,8 +15,8 @@ public class MainActivity extends SherlockMapActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        MapView mapView = (MapView)findViewById(R.id.mapview);
-        mapView.setBuiltInZoomControls(true);
+//        MapView mapView = (MapView)findViewById(R.id.map);
+//        mapView.setBuiltInZoomControls(true);
 
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        getSupportActionBar().setHomeButtonEnabled(true);

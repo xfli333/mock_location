@@ -17,6 +17,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="~apklib-com.actionbarsherlock_actionbarsherlock_4.2.0" />
+    <orderEntry type="module" module-name="google-play-services_lib" />
+    <orderEntry type="library" name="actionbarsherlock-plugin-maps-4.2.0" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">

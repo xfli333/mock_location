@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mock Location</string>
-    <string name="map_api_key">AIzaSyA7K8s5w1fup1bcNjIYSvYCff-6wPmVmxc</string>
+    <!--<string name="map_api_key">AIzaSyApy_kfVKLN0yJ8BYgTjxT6TycT51lCDPs</string>-->
+    <string name="map_api_key">AIzaSyCvqytrO2DZpoFZFHGQYR2ZdL9rl_vMj00</string>
 </resources>

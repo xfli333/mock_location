@@ -7,11 +7,12 @@ keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -sto
 
 debug
 Certificate fingerprints:
-	 MD5:  E7:9D:21:31:E6:58:CE:E3:65:49:76:B9:EF:0A:2D:EA
-	 SHA1: 28:8B:C9:C4:32:2E:A1:B0:90:92:82:42:41:17:67:AE:3C:42:13:57
+	 MD5:  7D:F4:D1:1B:59:9B:BD:7E:67:BF:5F:59:6D:6B:38:B9
+	 SHA1: 90:37:E8:3C:94:ED:B1:22:DE:C0:4A:35:5F:B1:1E:F8:4C:35:6B:46
 	 Signature algorithm name: SHA1withRSA
 	 Version: 3
 
+AIzaSyApy_kfVKLN0yJ8BYgTjxT6TycT51lCDPs
 
 keytool -list -v -keystore /Users/admin/mock_location.keystore -alias mock_location.keystore -storepass 982911 -keypass 982911
 
@@ -22,4 +23,5 @@ Certificate fingerprints:
 	 Signature algorithm name: SHA1withRSA
 	 Version: 3
 
-AIzaSyCjTfMXP8KZH4j9apfyIJg-BtavyIoAtxk
+
+AIzaSyCvqytrO2DZpoFZFHGQYR2ZdL9rl_vMj00

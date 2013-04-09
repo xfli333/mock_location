@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$USER_HOME$/SDK/android-sdk-macosx/extras/google/google_play_services/libproject/google-play-services_lib/google-play-services_lib.iml" filepath="$USER_HOME$/SDK/android-sdk-macosx/extras/google/google_play_services/libproject/google-play-services_lib/google-play-services_lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/mock_location.iml" filepath="$PROJECT_DIR$/mock_location.iml" />
       <module fileurl="file://$USER_HOME$/gitworkspace/android-bootstrap/app/gen-external-apklibs/~apklib-com.actionbarsherlock_actionbarsherlock_4.2.0.iml" filepath="$USER_HOME$/gitworkspace/android-bootstrap/app/gen-external-apklibs/~apklib-com.actionbarsherlock_actionbarsherlock_4.2.0.iml" />
     </modules>
