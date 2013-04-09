@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mock Location</string>
+    <string name="map_api_key">AIzaSyA7K8s5w1fup1bcNjIYSvYCff-6wPmVmxc</string>
 </resources>

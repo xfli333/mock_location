@@ -1,0 +1,25 @@
+
+https://developers.google.com/maps/documentation/android/start?hl=zh-CN#the_google_maps_api_key
+
+https://code.google.com/apis/console/b/0/?pli=1#project:420942578384:access
+
+keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+
+debug
+Certificate fingerprints:
+	 MD5:  E7:9D:21:31:E6:58:CE:E3:65:49:76:B9:EF:0A:2D:EA
+	 SHA1: 28:8B:C9:C4:32:2E:A1:B0:90:92:82:42:41:17:67:AE:3C:42:13:57
+	 Signature algorithm name: SHA1withRSA
+	 Version: 3
+
+
+keytool -list -v -keystore /Users/admin/mock_location.keystore -alias mock_location.keystore -storepass 982911 -keypass 982911
+
+
+Certificate fingerprints:
+	 MD5:  00:9B:BE:74:66:44:CE:41:D1:40:09:80:D9:BF:45:C0
+	 SHA1: D7:ED:C1:E3:0E:79:5E:3F:04:9A:02:F3:E6:E7:B8:6C:97:2D:D7:58
+	 Signature algorithm name: SHA1withRSA
+	 Version: 3
+
+AIzaSyCjTfMXP8KZH4j9apfyIJg-BtavyIoAtxk
