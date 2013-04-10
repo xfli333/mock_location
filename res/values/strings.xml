@@ -3,4 +3,5 @@
     <string name="app_name">Mock Location</string>
     <!--<string name="map_api_key">AIzaSyApy_kfVKLN0yJ8BYgTjxT6TycT51lCDPs</string>-->
     <string name="map_api_key">AIzaSyCvqytrO2DZpoFZFHGQYR2ZdL9rl_vMj00</string>
+    <string name="set_location">设为当前坐标</string>
 </resources>
