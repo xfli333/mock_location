@@ -9,6 +9,7 @@ import info.ishared.android.bean.LocationType;
 import info.ishared.android.bean.MockLatLng;
 import info.ishared.android.dao.MockLatLngDao;
 import info.ishared.android.service.MockLocationService;
+import info.ishared.android.util.SystemUtils;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -43,6 +44,11 @@ public class MainController {
     public void startMockLocation(LatLng latLng) {
         saveOrUpdateCurrentMockLocation(latLng);
         Intent intent = new Intent(mainActivity, MockLocationService.class);
+
+        if (SystemUtils.isServiceWorked(mainActivity, "info.ishared.android.service.MockLocationService")) {
+            mainActivity.stopService(intent);
+        }
+
         MockLocationService.latLng = latLng;
         mainActivity.startService(intent);
     }

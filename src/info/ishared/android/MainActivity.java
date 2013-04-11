@@ -1,6 +1,10 @@
 package info.ishared.android;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Criteria;
 import android.location.Location;
@@ -20,6 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import info.ishared.android.util.FormatUtils;
+import info.ishared.android.util.SystemUtils;
 
 public class MainActivity extends SherlockMapActivity {
     /**
@@ -36,13 +41,15 @@ public class MainActivity extends SherlockMapActivity {
 
     private ListView listView;
 
-    private String title[] = {"全部", "我的微博", "周边", "智能排版", "同学"};
+    private String title[] = {"设置当前位置", "收藏", "查看收藏", "停止"};
     LayoutInflater layoutInflater;
 
     MainController mainController;
 
     private LatLng defaultLatLng;
 
+    int notificationID = 10;
+    NotificationManager notificationManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,10 +57,9 @@ public class MainActivity extends SherlockMapActivity {
         setContentView(R.layout.main);
         mainController = new MainController(this);
         mHandler = new Handler();
-
         defaultLatLng = this.mainController.getLastMockLocation();
-
-
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(notificationID);
         mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         if (defaultLatLng != null) {
             previousMarker = mMap.addMarker(new MarkerOptions().draggable(true).position(defaultLatLng).title("坐标:").snippet(FormatUtils.formatLatLngNumber(defaultLatLng.latitude) + "," + FormatUtils.formatLatLngNumber(defaultLatLng.longitude)));
@@ -62,6 +68,8 @@ public class MainActivity extends SherlockMapActivity {
             defaultLatLng = new LatLng(30.66, 104.07);
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLatLng, 6));
+
+
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -97,34 +105,66 @@ public class MainActivity extends SherlockMapActivity {
     }
 
 
-    @Override
-    protected boolean isRouteDisplayed() {
-        return false;
-    }
+    private void initNotification() {
 
+        boolean isServiceRunning = SystemUtils.isServiceWorked(this, "info.ishared.android.service.MockLocationService");
+            String notificationText = isServiceRunning ? "筋斗云正在运行" : "筋斗云已经停止";
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+            // Create the notification
+            Notification notification = new Notification(R.drawable.ic_launcher, notificationText,
+                    System.currentTimeMillis());
+            notification.flags |= Notification.FLAG_ONGOING_EVENT; // 将此通知放到通知栏的"Ongoing"即"正在运行"组中
+            notification.flags |= Notification.FLAG_NO_CLEAR; // 表明在点击了通知栏中的"清除通知"后，此通知不清除，经常与FLAG_ONGOING_EVENT一起使用
+            notification.flags |= Notification.FLAG_SHOW_LIGHTS; // set LED on
+            // notification.defaults = Notification.DEFAULT_LIGHTS; //默认Notification lights;
+            notification.ledARGB = R.color.abs__holo_blue_light; // LED 颜色;
+            notification.ledOnMS = 5000; // LED 亮时间
 
-        switch (item.getItemId()) {
-            case R.id.menu_set:
-                Toast.makeText(this, previousMarker.getSnippet(), Toast.LENGTH_SHORT).show();
-                mainController.startMockLocation(previousMarker.getPosition());
-                break;
-            case R.id.menu_more:
-                mainController.stopMockLocationService();
-//                showPopupWindow(this.findViewById(R.id.menu_more));
-                break;
-
+            // Create the notification expanded message
+            // When the user clicks on it, it opens your activity
+            Intent intent = new Intent(this, MainActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+            notification.setLatestEventInfo(this, notificationText, FormatUtils.formatLatLngNumber(defaultLatLng.latitude) + "," + FormatUtils.formatLatLngNumber(defaultLatLng.longitude), pendingIntent);
+            // Show notification
+            notificationManager.notify(notificationID, notification);
         }
-        return super.onOptionsItemSelected(item);
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getSupportMenuInflater().inflate(R.menu.activity_main, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
+
+        @Override
+        protected boolean isRouteDisplayed () {
+            return false;
+        }
+
+
+        @Override
+        public void onBackPressed () {
+            initNotification();
+            super.onBackPressed();
+//        this.finish();
+        }
+
+        @Override
+        public boolean onOptionsItemSelected (MenuItem item){
+
+            switch (item.getItemId()) {
+                case R.id.menu_set:
+                    Toast.makeText(this, previousMarker.getSnippet(), Toast.LENGTH_SHORT).show();
+                    mainController.startMockLocation(previousMarker.getPosition());
+                    break;
+                case R.id.menu_more:
+                    mainController.stopMockLocationService();
+//                showPopupWindow(this.findViewById(R.id.menu_more));
+                    break;
+
+            }
+            return super.onOptionsItemSelected(item);
+        }
+
+        @Override
+        public boolean onCreateOptionsMenu (Menu menu){
+            getSupportMenuInflater().inflate(R.menu.activity_main, menu);
+            return super.onCreateOptionsMenu(menu);
+        }
 
 
     private void showPopupWindow(View view) {
