@@ -1,6 +1,10 @@
 package info.ishared.android;
 
+import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -35,15 +39,29 @@ public class MainActivity extends SherlockMapActivity {
     private String title[] = {"全部", "我的微博", "周边", "智能排版", "同学"};
     LayoutInflater layoutInflater;
 
+    MainController mainController;
+
+    private LatLng defaultLatLng;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        mainController = new MainController(this);
         mHandler = new Handler();
+
+        defaultLatLng = this.mainController.getLastMockLocation();
 
 
         mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(30.66, 104.07), 6));
+        if (defaultLatLng != null) {
+            previousMarker = mMap.addMarker(new MarkerOptions().draggable(true).position(defaultLatLng).title("坐标:").snippet(FormatUtils.formatLatLngNumber(defaultLatLng.latitude) + "," + FormatUtils.formatLatLngNumber(defaultLatLng.longitude)));
+            previousMarker.showInfoWindow();
+        } else {
+            defaultLatLng = new LatLng(30.66, 104.07);
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLatLng, 6));
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -91,9 +109,11 @@ public class MainActivity extends SherlockMapActivity {
         switch (item.getItemId()) {
             case R.id.menu_set:
                 Toast.makeText(this, previousMarker.getSnippet(), Toast.LENGTH_SHORT).show();
+                mainController.startMockLocation(previousMarker.getPosition());
                 break;
             case R.id.menu_more:
-                showPopupWindow(this.findViewById(R.id.menu_more));
+                mainController.stopMockLocationService();
+//                showPopupWindow(this.findViewById(R.id.menu_more));
                 break;
 
         }
@@ -135,4 +155,7 @@ public class MainActivity extends SherlockMapActivity {
         }
     }
 
+    public Marker getPreviousMarker() {
+        return previousMarker;
+    }
 }
