@@ -6,12 +6,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
 import com.actionbarsherlock.app.SherlockMapActivity;
@@ -41,7 +44,7 @@ public class MainActivity extends SherlockMapActivity {
 
     private ListView listView;
 
-    private String title[] = {"设置当前位置", "收藏", "查看收藏", "停止"};
+    private String title[] = {"设置当前位置", "收藏", "查看收藏", "退出"};
     LayoutInflater layoutInflater;
 
     MainController mainController;
@@ -152,8 +155,8 @@ public class MainActivity extends SherlockMapActivity {
                     mainController.startMockLocation(previousMarker.getPosition());
                     break;
                 case R.id.menu_more:
-                    mainController.stopMockLocationService();
-//                showPopupWindow(this.findViewById(R.id.menu_more));
+//                    mainController.stopMockLocationService();
+                showPopupWindow(this.findViewById(R.id.menu_more));
                     break;
 
             }
@@ -174,7 +177,8 @@ public class MainActivity extends SherlockMapActivity {
         } else {
             layoutInflater = getLayoutInflater();
             View menu_view = layoutInflater.inflate(R.layout.pop_menu, null);
-            mPopupWindow = new PopupWindow(menu_view, 200, 300);
+            mPopupWindow = new PopupWindow(menu_view, 200, 240);
+            mPopupWindow.setBackgroundDrawable(new BitmapDrawable() );
             mPopupWindow.setOutsideTouchable(true);
             mPopupWindow.setFocusable(true);
             listView = (ListView) menu_view.findViewById(R.id.lv_dialog);
@@ -186,6 +190,17 @@ public class MainActivity extends SherlockMapActivity {
                 public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                     mPopupWindow.dismiss();
                     mPopupWindow = null;
+
+                    switch (arg2){
+                        case 3:
+                            mainController.stopMockLocationService();
+                            notificationManager.cancel(notificationID);
+                            MainActivity.this.finish();
+                            break;
+                    }
+
+
+
                 }
             });
 
@@ -197,5 +212,15 @@ public class MainActivity extends SherlockMapActivity {
 
     public Marker getPreviousMarker() {
         return previousMarker;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        Log.d(AppConfig.TAG,"onTouchEvent");
+        if (mPopupWindow != null && mPopupWindow.isShowing()) {
+            mPopupWindow.dismiss();
+        }
+        return super.onTouchEvent(event);
     }
 }
