@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import info.ishared.android.util.FormatUtils;
 import info.ishared.android.util.SystemUtils;
+import info.ishared.android.util.ToastUtils;
 
 public class MainActivity extends SherlockMapActivity {
     /**
@@ -44,7 +45,7 @@ public class MainActivity extends SherlockMapActivity {
 
     private ListView listView;
 
-    private String title[] = {"设置当前位置", "收藏", "查看收藏", "退出"};
+    private String title[] = {"停止模拟", "收藏", "查看收藏", "退出"};
     LayoutInflater layoutInflater;
 
     MainController mainController;
@@ -151,7 +152,7 @@ public class MainActivity extends SherlockMapActivity {
 
             switch (item.getItemId()) {
                 case R.id.menu_set:
-                    Toast.makeText(this, previousMarker.getSnippet(), Toast.LENGTH_SHORT).show();
+                    ToastUtils.showMessage(this,"模拟位置:"+previousMarker.getSnippet());
                     mainController.startMockLocation(previousMarker.getPosition());
                     onBackPressed();
                     break;
@@ -193,6 +194,10 @@ public class MainActivity extends SherlockMapActivity {
                     mPopupWindow = null;
 
                     switch (arg2){
+                        case 0:
+                            mainController.stopMockLocationService();
+                            ToastUtils.showMessage(MainActivity.this,"停止模拟位置");
+                            break;
                         case 3:
                             mainController.stopMockLocationService();
                             notificationManager.cancel(notificationID);
@@ -215,13 +220,4 @@ public class MainActivity extends SherlockMapActivity {
         return previousMarker;
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-
-        Log.d(AppConfig.TAG,"onTouchEvent");
-        if (mPopupWindow != null && mPopupWindow.isShowing()) {
-            mPopupWindow.dismiss();
-        }
-        return super.onTouchEvent(event);
-    }
 }
