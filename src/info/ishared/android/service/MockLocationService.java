@@ -51,13 +51,14 @@ public class MockLocationService extends Service {
     public void onCreate() {
         mockLatLngDao = new MockLatLngDao(this);
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-//        Criteria criteria = new Criteria();
-//        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-//        criteria.setAltitudeRequired(false);
-//        criteria.setBearingRequired(false);
-//        criteria.setCostAllowed(true);
-//        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setCostAllowed(true);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
 //        provider = locationManager.getBestProvider(criteria, true);
+//        if(provider == null) provider = LocationManager.GPS_PROVIDER;
         if (locationManager.getProvider(provider) != null) {
             locationManager.removeTestProvider(provider);
         }

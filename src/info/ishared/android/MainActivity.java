@@ -153,6 +153,7 @@ public class MainActivity extends SherlockMapActivity {
                 case R.id.menu_set:
                     Toast.makeText(this, previousMarker.getSnippet(), Toast.LENGTH_SHORT).show();
                     mainController.startMockLocation(previousMarker.getPosition());
+                    onBackPressed();
                     break;
                 case R.id.menu_more:
 //                    mainController.stopMockLocationService();
