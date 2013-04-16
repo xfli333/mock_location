@@ -1,21 +1,16 @@
 package info.ishared.android;
 
-import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.location.LocationManager;
 import com.google.android.gms.maps.model.LatLng;
 import info.ishared.android.bean.LocationType;
 import info.ishared.android.bean.MockLatLng;
 import info.ishared.android.dao.MockLatLngDao;
 import info.ishared.android.service.MockLocationService;
-import info.ishared.android.util.SystemUtils;
 
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created with IntelliJ IDEA.
@@ -44,17 +39,27 @@ public class MainController {
     public void startMockLocation(LatLng latLng) {
         saveOrUpdateCurrentMockLocation(latLng);
         Intent intent = new Intent(mainActivity, MockLocationService.class);
+//
+//        if (SystemUtils.isServiceWorked(mainActivity, "info.ishared.android.service.MockLocationService")) {
+//            mainActivity.stopService(intent);
+//        }
+//
+//        MockLocationService.latLng = latLng;
+//        mainActivity.startService(intent);
 
-        if (SystemUtils.isServiceWorked(mainActivity, "info.ishared.android.service.MockLocationService")) {
-            mainActivity.stopService(intent);
-        }
-
-        MockLocationService.latLng = latLng;
+//        Intent intent = new Intent(mainActivity, FakeGPSService.class);
+//
+//        if (SystemUtils.isServiceWorked(mainActivity, "info.ishared.android.service.MockLocationService")) {
+//            mainActivity.stopService(intent);
+//        }
+//
+//        MockLocationService.latLng = latLng;
         mainActivity.startService(intent);
     }
 
     public void stopMockLocationService() {
         Intent intent = new Intent(mainActivity, MockLocationService.class);
+//        Intent intent = new Intent(mainActivity, FakeGPSService.class);
         mainActivity.stopService(intent);
     }
 

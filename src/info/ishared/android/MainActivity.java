@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -219,5 +220,6 @@ public class MainActivity extends SherlockMapActivity {
     public Marker getPreviousMarker() {
         return previousMarker;
     }
+
 
 }
