@@ -1,6 +1,7 @@
 package info.ishared.android.service;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.*;
@@ -29,7 +30,13 @@ public class MockLocationService extends Service {
 
     private Handler handler;
     MockLocationThread mockLocationThread;
+    BroadcastReceiver broadcastSettingsChanged = new BroadcastReceiver(){
 
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+        }
+    };
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -40,7 +47,7 @@ public class MockLocationService extends Service {
     public void onCreate() {
         handler = new Handler();
         mockLocationThread = new MockLocationThread(getApplicationContext(), handler);
-        handler.postDelayed(mockLocationThread, 1000);
+        handler.postDelayed(mockLocationThread, 3000);
 
     }
 

@@ -5,6 +5,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import info.ishared.android.AppConfig;
@@ -36,19 +37,19 @@ public class MockLocationThread implements Runnable {
         this.locationManager = ((LocationManager) paramContext.getSystemService("location"));
         this.mockLatLngDao = new MockLatLngDao(context);
         try {
-            this.locationManager.addTestProvider(provider, false, false, false, false, false, false, false, 1, 1);
+            this.locationManager.addTestProvider(provider, false, false, false, false,true, true, true, 0, 5);
             this.locationManager.setTestProviderEnabled(provider, true);
             return;
         } catch (IllegalArgumentException localIllegalArgumentException) {
             this.locationManager.removeTestProvider(provider);
-            this.locationManager.addTestProvider(provider, false, false, false, false, false, false, false, 1, 1);
+            this.locationManager.addTestProvider(provider, false, false, false, false, true, true, true, 0, 5);
         }
     }
 
     @Override
     public void run() {
-        mockLocation(this.latLng);
-        handler.postDelayed(this, 3000);
+            mockLocation(this.latLng);
+        handler.postDelayed(this, 10000);
     }
 
     public void unRegister() {
@@ -61,7 +62,8 @@ public class MockLocationThread implements Runnable {
     private void mockLocation(LatLng latLng) {
         Log.d(AppConfig.TAG, "mockLocation .........");
         Location loc = new Location(provider);
-        loc.setTime(System.currentTimeMillis());
+        Long time = System.currentTimeMillis();
+        loc.setTime(time);
 
         if (latLng == null) {
             Log.d(AppConfig.TAG, "latLng is null");
@@ -76,8 +78,25 @@ public class MockLocationThread implements Runnable {
             loc.setLongitude(latLng.longitude);
         }
         locationManager.setTestProviderEnabled(provider, true);
-        locationManager.setTestProviderStatus(provider, LocationProvider.AVAILABLE, null, System.currentTimeMillis());
+        locationManager.setTestProviderStatus(provider, LocationProvider.AVAILABLE, null, time);
         locationManager.setTestProviderLocation(provider, loc);
 
+    }
+
+    protected void enableMockAndGetOldValue() {
+        int i = 1;
+        try {
+            i = Settings.Secure.getInt(this.context.getContentResolver(), "mock_location");
+            Settings.Secure.putInt(this.context.getContentResolver(), "mock_location", 1);
+        } catch (Exception localException) {
+        }
+    }
+
+    protected void restoreMock(int paramInt) {
+        try {
+            Settings.Secure.putInt(this.context.getContentResolver(), "mock_location", paramInt);
+
+        } catch (Exception localException) {
+        }
     }
 }

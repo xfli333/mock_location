@@ -24,6 +24,8 @@
             </intent-filter>
         </service>
 
+        <service android:name=".service.NewMockLocationService"/>
+
         <meta-data
                 android:name="com.google.android.maps.v2.API_KEY"
                 android:value="AIzaSyApy_kfVKLN0yJ8BYgTjxT6TycT51lCDPs"/>

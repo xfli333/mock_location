@@ -2,11 +2,12 @@ package info.ishared.android;
 
 import android.content.Intent;
 import android.location.LocationManager;
+import android.os.Bundle;
 import com.google.android.gms.maps.model.LatLng;
 import info.ishared.android.bean.LocationType;
 import info.ishared.android.bean.MockLatLng;
 import info.ishared.android.dao.MockLatLngDao;
-import info.ishared.android.service.MockLocationService;
+import info.ishared.android.service.NewMockLocationService;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -38,7 +39,8 @@ public class MainController {
 
     public void startMockLocation(LatLng latLng) {
         saveOrUpdateCurrentMockLocation(latLng);
-        Intent intent = new Intent(mainActivity, MockLocationService.class);
+//        Intent intent = new Intent(mainActivity, MockLocationService.class);
+        Intent intent = new Intent(mainActivity, NewMockLocationService.class);
 //
 //        if (SystemUtils.isServiceWorked(mainActivity, "info.ishared.android.service.MockLocationService")) {
 //            mainActivity.stopService(intent);
@@ -54,11 +56,12 @@ public class MainController {
 //        }
 //
 //        MockLocationService.latLng = latLng;
+        intent.putExtras(new Bundle());
         mainActivity.startService(intent);
     }
 
     public void stopMockLocationService() {
-        Intent intent = new Intent(mainActivity, MockLocationService.class);
+        Intent intent = new Intent(mainActivity, NewMockLocationService.class);
 //        Intent intent = new Intent(mainActivity, FakeGPSService.class);
         mainActivity.stopService(intent);
     }
