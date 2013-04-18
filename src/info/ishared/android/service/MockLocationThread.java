@@ -24,79 +24,78 @@ import java.util.List;
 public class MockLocationThread implements Runnable {
     private String provider = LocationManager.GPS_PROVIDER;
     private Context context;
-    private Location lastLocation;
     private LocationManager locationManager;
     private LatLng latLng;
     private MockLatLngDao mockLatLngDao;
     private Handler handler;
+    private Location loc;
 
 
-    public MockLocationThread(Context paramContext, Handler handler) {
+    public MockLocationThread(Context paramContext) {
         this.context = paramContext;
-        this.handler = handler;
-        this.locationManager = ((LocationManager) paramContext.getSystemService("location"));
+        this.handler = new Handler();
+        this.locationManager = (LocationManager) paramContext.getSystemService("location");
         this.mockLatLngDao = new MockLatLngDao(context);
+        loc = new Location(provider);
         try {
-            this.locationManager.addTestProvider(provider, false, false, false, false,true, true, true, 0, 5);
+            this.locationManager.addTestProvider("gps", false, false, false, false, false, false, false, 1, 1);
             this.locationManager.setTestProviderEnabled(provider, true);
             return;
         } catch (IllegalArgumentException localIllegalArgumentException) {
+            Log.d(AppConfig.TAG, "localIllegalArgumentException ......");
             this.locationManager.removeTestProvider(provider);
-            this.locationManager.addTestProvider(provider, false, false, false, false, true, true, true, 0, 5);
+            this.locationManager.addTestProvider("gps", false, false, false, false, false, false, false, 1, 1);
         }
     }
 
     @Override
     public void run() {
-            mockLocation(this.latLng);
-        handler.postDelayed(this, 10000);
+
+        mockLocation(this.latLng);
+        handler.postDelayed(this, 3000L);
     }
 
     public void unRegister() {
         try {
             this.locationManager.removeTestProvider("gps");
+            handler.removeCallbacks(this);
         } catch (Exception localException) {
         }
     }
 
     private void mockLocation(LatLng latLng) {
-        Log.d(AppConfig.TAG, "mockLocation .........");
-        Location loc = new Location(provider);
+        Log.d(AppConfig.TAG, "mockLocation ......"+this.loc.getLatitude()+","+this.loc.getLongitude());
+
         Long time = System.currentTimeMillis();
-        loc.setTime(time);
+        this.loc.setTime(time);
 
-        if (latLng == null) {
-            Log.d(AppConfig.TAG, "latLng is null");
-            List<MockLatLng> mockLatLngList = this.mockLatLngDao.queryMockLatLngByType(LocationType.LAST);
-            if (!mockLatLngList.isEmpty()) {
-                loc.setLatitude(mockLatLngList.get(0).getLatitude());
-                loc.setLongitude(mockLatLngList.get(0).getLongitude());
-                this.latLng = new LatLng(mockLatLngList.get(0).getLatitude(), mockLatLngList.get(0).getLongitude());
-            }
-        } else {
-            loc.setLatitude(latLng.latitude);
-            loc.setLongitude(latLng.longitude);
-        }
-        locationManager.setTestProviderEnabled(provider, true);
-        locationManager.setTestProviderStatus(provider, LocationProvider.AVAILABLE, null, time);
-        locationManager.setTestProviderLocation(provider, loc);
+//        if (latLng == null) {
+//            Log.d(AppConfig.TAG, "latLng is null");
+//            List<MockLatLng> mockLatLngList = this.mockLatLngDao.queryMockLatLngByType(LocationType.LAST);
+//            if (!mockLatLngList.isEmpty()) {
+//                this.loc.setLatitude(mockLatLngList.get(0).getLatitude());
+//                this.loc.setLongitude(mockLatLngList.get(0).getLongitude());
+//                this.latLng = new LatLng(mockLatLngList.get(0).getLatitude(), mockLatLngList.get(0).getLongitude());
+//            }
+//        } else {
+//            this.loc.setLatitude(latLng.latitude);
+//            this.loc.setLongitude(latLng.longitude);
+//        }
+
+
+//        locationManager.setTestProviderEnabled(provider, true);
+//        locationManager.setTestProviderStatus(provider, LocationProvider.AVAILABLE, null, time);
+        this.locationManager.setTestProviderLocation(provider, this.loc);
+//        Settings.Secure.putInt(this.context.getContentResolver(), "mock_location", 1);
 
     }
 
-    protected void enableMockAndGetOldValue() {
-        int i = 1;
-        try {
-            i = Settings.Secure.getInt(this.context.getContentResolver(), "mock_location");
-            Settings.Secure.putInt(this.context.getContentResolver(), "mock_location", 1);
-        } catch (Exception localException) {
-        }
-    }
-
-    protected void restoreMock(int paramInt) {
-        try {
-            Settings.Secure.putInt(this.context.getContentResolver(), "mock_location", paramInt);
-
-        } catch (Exception localException) {
-        }
+    public void setNewLocation(double paramDouble1, double paramDouble2) {
+        Location localLocation = new Location("gps");
+        localLocation.setLongitude(paramDouble2);
+        localLocation.setLatitude(paramDouble1);
+        this.loc = localLocation;
+        this.handler.removeCallbacks(this);
+        this.handler.post(this);
     }
 }

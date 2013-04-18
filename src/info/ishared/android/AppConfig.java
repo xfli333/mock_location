@@ -8,4 +8,5 @@ package info.ishared.android;
  */
 public class AppConfig {
     public static final String TAG = "Mock_Location";
+    public static final String SETTINGS_CHANGED="SETTINGS_CHANGED";
 }

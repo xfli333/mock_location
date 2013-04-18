@@ -7,6 +7,7 @@ import com.google.android.gms.maps.model.LatLng;
 import info.ishared.android.bean.LocationType;
 import info.ishared.android.bean.MockLatLng;
 import info.ishared.android.dao.MockLatLngDao;
+import info.ishared.android.service.MockLocationService;
 import info.ishared.android.service.NewMockLocationService;
 
 import java.util.List;
@@ -22,13 +23,7 @@ import java.util.concurrent.Executors;
 public class MainController {
 
     private MainActivity mainActivity;
-    LocationManager locationManager;
 
-    String provider = LocationManager.GPS_PROVIDER;
-    private ExecutorService executor = Executors.newFixedThreadPool(1);
-
-    private boolean flag = true;
-    private LatLng latLng;
 
     private MockLatLngDao mockLatLngDao;
 
@@ -40,28 +35,19 @@ public class MainController {
     public void startMockLocation(LatLng latLng) {
         saveOrUpdateCurrentMockLocation(latLng);
 //        Intent intent = new Intent(mainActivity, MockLocationService.class);
-        Intent intent = new Intent(mainActivity, NewMockLocationService.class);
+//        Intent intent = new Intent(mainActivity, NewMockLocationService.class);
 //
 //        if (SystemUtils.isServiceWorked(mainActivity, "info.ishared.android.service.MockLocationService")) {
 //            mainActivity.stopService(intent);
 //        }
 //
-//        MockLocationService.latLng = latLng;
-//        mainActivity.startService(intent);
 
-//        Intent intent = new Intent(mainActivity, FakeGPSService.class);
-//
-//        if (SystemUtils.isServiceWorked(mainActivity, "info.ishared.android.service.MockLocationService")) {
-//            mainActivity.stopService(intent);
-//        }
-//
-//        MockLocationService.latLng = latLng;
-        intent.putExtras(new Bundle());
-        mainActivity.startService(intent);
+
+        mainActivity.startService(new Intent(mainActivity, MockLocationService.class).putExtra("latitude",latLng.latitude).putExtra("longitude",latLng.longitude));
     }
 
     public void stopMockLocationService() {
-        Intent intent = new Intent(mainActivity, NewMockLocationService.class);
+        Intent intent = new Intent(mainActivity, MockLocationService.class);
 //        Intent intent = new Intent(mainActivity, FakeGPSService.class);
         mainActivity.stopService(intent);
     }

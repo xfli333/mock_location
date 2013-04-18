@@ -27,6 +27,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import info.ishared.android.service.MockLocationService;
 import info.ishared.android.util.FormatUtils;
 import info.ishared.android.util.SystemUtils;
 import info.ishared.android.util.ToastUtils;
@@ -54,7 +55,7 @@ public class MainActivity extends SherlockMapActivity {
     private LatLng defaultLatLng;
 
     int notificationID = 10;
-    NotificationManager notificationManager;
+//    NotificationManager notificationManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,8 +64,8 @@ public class MainActivity extends SherlockMapActivity {
         mainController = new MainController(this);
         mHandler = new Handler();
         defaultLatLng = this.mainController.getLastMockLocation();
-        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(notificationID);
+//        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        notificationManager.cancel(notificationID);
         mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         if (defaultLatLng != null) {
             previousMarker = mMap.addMarker(new MarkerOptions().draggable(true).position(defaultLatLng).title("坐标:").snippet(FormatUtils.formatLatLngNumber(defaultLatLng.latitude) + "," + FormatUtils.formatLatLngNumber(defaultLatLng.longitude)));
@@ -110,29 +111,29 @@ public class MainActivity extends SherlockMapActivity {
     }
 
 
-    private void initNotification() {
-
-        boolean isServiceRunning = SystemUtils.isServiceWorked(this, "info.ishared.android.service.MockLocationService");
-            String notificationText = isServiceRunning ? "筋斗云正在运行" : "筋斗云已经停止";
-
-            // Create the notification
-            Notification notification = new Notification(R.drawable.ic_launcher, notificationText,
-                    System.currentTimeMillis());
-            notification.flags |= Notification.FLAG_ONGOING_EVENT; // 将此通知放到通知栏的"Ongoing"即"正在运行"组中
-            notification.flags |= Notification.FLAG_NO_CLEAR; // 表明在点击了通知栏中的"清除通知"后，此通知不清除，经常与FLAG_ONGOING_EVENT一起使用
-            notification.flags |= Notification.FLAG_SHOW_LIGHTS; // set LED on
-            // notification.defaults = Notification.DEFAULT_LIGHTS; //默认Notification lights;
-            notification.ledARGB = R.color.abs__holo_blue_light; // LED 颜色;
-            notification.ledOnMS = 5000; // LED 亮时间
-
-            // Create the notification expanded message
-            // When the user clicks on it, it opens your activity
-            Intent intent = new Intent(this, MainActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-            notification.setLatestEventInfo(this, notificationText, FormatUtils.formatLatLngNumber(defaultLatLng.latitude) + "," + FormatUtils.formatLatLngNumber(defaultLatLng.longitude), pendingIntent);
-            // Show notification
-            notificationManager.notify(notificationID, notification);
-        }
+//    private void initNotification() {
+//
+//        boolean isServiceRunning = SystemUtils.isServiceWorked(this, "info.ishared.android.service.MockLocationService");
+//            String notificationText = isServiceRunning ? "筋斗云正在运行" : "筋斗云已经停止";
+//
+//            // Create the notification
+//            Notification notification = new Notification(R.drawable.ic_launcher, notificationText,
+//                    System.currentTimeMillis());
+//            notification.flags |= Notification.FLAG_ONGOING_EVENT; // 将此通知放到通知栏的"Ongoing"即"正在运行"组中
+//            notification.flags |= Notification.FLAG_NO_CLEAR; // 表明在点击了通知栏中的"清除通知"后，此通知不清除，经常与FLAG_ONGOING_EVENT一起使用
+//            notification.flags |= Notification.FLAG_SHOW_LIGHTS; // set LED on
+//            // notification.defaults = Notification.DEFAULT_LIGHTS; //默认Notification lights;
+//            notification.ledARGB = R.color.abs__holo_blue_light; // LED 颜色;
+//            notification.ledOnMS = 5000; // LED 亮时间
+//
+//            // Create the notification expanded message
+//            // When the user clicks on it, it opens your activity
+//            Intent intent = new Intent(this, MainActivity.class);
+//            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+//            notification.setLatestEventInfo(this, notificationText, FormatUtils.formatLatLngNumber(defaultLatLng.latitude) + "," + FormatUtils.formatLatLngNumber(defaultLatLng.longitude), pendingIntent);
+//            // Show notification
+//            notificationManager.notify(notificationID, notification);
+//        }
 
 
         @Override
@@ -143,9 +144,7 @@ public class MainActivity extends SherlockMapActivity {
 
         @Override
         public void onBackPressed () {
-            initNotification();
-            super.onBackPressed();
-//        this.finish();
+            this.finish();
         }
 
         @Override
@@ -155,7 +154,7 @@ public class MainActivity extends SherlockMapActivity {
                 case R.id.menu_set:
                     ToastUtils.showMessage(this,"模拟位置:"+previousMarker.getSnippet());
                     mainController.startMockLocation(previousMarker.getPosition());
-                    onBackPressed();
+                    this.finish();
                     break;
                 case R.id.menu_more:
 //                    mainController.stopMockLocationService();
@@ -201,7 +200,6 @@ public class MainActivity extends SherlockMapActivity {
                             break;
                         case 3:
                             mainController.stopMockLocationService();
-                            notificationManager.cancel(notificationID);
                             MainActivity.this.finish();
                             break;
                     }
