@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import info.ishared.android.service.MockLocationService;
+import info.ishared.android.util.AlertDialogUtils;
 import info.ishared.android.util.FormatUtils;
 import info.ishared.android.util.SystemUtils;
 import info.ishared.android.util.ToastUtils;
@@ -47,15 +48,13 @@ public class MainActivity extends SherlockMapActivity {
 
     private ListView listView;
 
-    private String title[] = {"停止模拟", "收藏", "查看收藏", "退出"};
+    private String title[] = {"停止模拟", "收藏位置", "查看收藏", "帮助说明", "退出程序"};
     LayoutInflater layoutInflater;
 
     MainController mainController;
 
     private LatLng defaultLatLng;
 
-    int notificationID = 10;
-//    NotificationManager notificationManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,8 +63,6 @@ public class MainActivity extends SherlockMapActivity {
         mainController = new MainController(this);
         mHandler = new Handler();
         defaultLatLng = this.mainController.getLastMockLocation();
-//        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        notificationManager.cancel(notificationID);
         mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         if (defaultLatLng != null) {
             previousMarker = mMap.addMarker(new MarkerOptions().draggable(true).position(defaultLatLng).title("坐标:").snippet(FormatUtils.formatLatLngNumber(defaultLatLng.latitude) + "," + FormatUtils.formatLatLngNumber(defaultLatLng.longitude)));
@@ -110,66 +107,41 @@ public class MainActivity extends SherlockMapActivity {
 //        });
     }
 
-
-//    private void initNotification() {
-//
-//        boolean isServiceRunning = SystemUtils.isServiceWorked(this, "info.ishared.android.service.MockLocationService");
-//            String notificationText = isServiceRunning ? "筋斗云正在运行" : "筋斗云已经停止";
-//
-//            // Create the notification
-//            Notification notification = new Notification(R.drawable.ic_launcher, notificationText,
-//                    System.currentTimeMillis());
-//            notification.flags |= Notification.FLAG_ONGOING_EVENT; // 将此通知放到通知栏的"Ongoing"即"正在运行"组中
-//            notification.flags |= Notification.FLAG_NO_CLEAR; // 表明在点击了通知栏中的"清除通知"后，此通知不清除，经常与FLAG_ONGOING_EVENT一起使用
-//            notification.flags |= Notification.FLAG_SHOW_LIGHTS; // set LED on
-//            // notification.defaults = Notification.DEFAULT_LIGHTS; //默认Notification lights;
-//            notification.ledARGB = R.color.abs__holo_blue_light; // LED 颜色;
-//            notification.ledOnMS = 5000; // LED 亮时间
-//
-//            // Create the notification expanded message
-//            // When the user clicks on it, it opens your activity
-//            Intent intent = new Intent(this, MainActivity.class);
-//            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-//            notification.setLatestEventInfo(this, notificationText, FormatUtils.formatLatLngNumber(defaultLatLng.latitude) + "," + FormatUtils.formatLatLngNumber(defaultLatLng.longitude), pendingIntent);
-//            // Show notification
-//            notificationManager.notify(notificationID, notification);
-//        }
+    @Override
+    protected boolean isRouteDisplayed() {
+        return false;
+    }
 
 
-        @Override
-        protected boolean isRouteDisplayed () {
-            return false;
-        }
+    @Override
+    public void onBackPressed() {
+        this.finish();
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-        @Override
-        public void onBackPressed () {
-            this.finish();
-        }
-
-        @Override
-        public boolean onOptionsItemSelected (MenuItem item){
-
-            switch (item.getItemId()) {
-                case R.id.menu_set:
-                    ToastUtils.showMessage(this,"模拟位置:"+previousMarker.getSnippet());
+        switch (item.getItemId()) {
+            case R.id.menu_set:
+                if (previousMarker == null) {
+                    AlertDialogUtils.showConfirmDiaLog(this, "请先设置一个要模拟的位置.");
+                } else {
                     mainController.startMockLocation(previousMarker.getPosition());
-                    this.finish();
-                    break;
-                case R.id.menu_more:
-//                    mainController.stopMockLocationService();
+                }
+                break;
+            case R.id.menu_more:
                 showPopupWindow(this.findViewById(R.id.menu_more));
-                    break;
+                break;
 
-            }
-            return super.onOptionsItemSelected(item);
         }
+        return super.onOptionsItemSelected(item);
+    }
 
-        @Override
-        public boolean onCreateOptionsMenu (Menu menu){
-            getSupportMenuInflater().inflate(R.menu.activity_main, menu);
-            return super.onCreateOptionsMenu(menu);
-        }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getSupportMenuInflater().inflate(R.menu.activity_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
 
     private void showPopupWindow(View view) {
@@ -179,8 +151,8 @@ public class MainActivity extends SherlockMapActivity {
         } else {
             layoutInflater = getLayoutInflater();
             View menu_view = layoutInflater.inflate(R.layout.pop_menu, null);
-            mPopupWindow = new PopupWindow(menu_view, 200, 240);
-            mPopupWindow.setBackgroundDrawable(new BitmapDrawable() );
+            mPopupWindow = new PopupWindow(menu_view, 200, 285);
+            mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
             mPopupWindow.setOutsideTouchable(true);
             mPopupWindow.setFocusable(true);
             listView = (ListView) menu_view.findViewById(R.id.lv_dialog);
@@ -193,17 +165,16 @@ public class MainActivity extends SherlockMapActivity {
                     mPopupWindow.dismiss();
                     mPopupWindow = null;
 
-                    switch (arg2){
+                    switch (arg2) {
                         case 0:
                             mainController.stopMockLocationService();
-                            ToastUtils.showMessage(MainActivity.this,"停止模拟位置");
+                            ToastUtils.showMessage(MainActivity.this, "停止模拟位置");
                             break;
-                        case 3:
+                        case 4:
                             mainController.stopMockLocationService();
                             MainActivity.this.finish();
                             break;
                     }
-
 
 
                 }
@@ -214,10 +185,4 @@ public class MainActivity extends SherlockMapActivity {
 
         }
     }
-
-    public Marker getPreviousMarker() {
-        return previousMarker;
-    }
-
-
 }

@@ -11,6 +11,7 @@ public class MockLatLng {
     private Double latitude;
     private Double longitude;
     private String locationType;
+    private String favName;
 
     public Long getId() {
         return id;
@@ -42,5 +43,13 @@ public class MockLatLng {
 
     public void setLocationType(String locationType) {
         this.locationType = locationType;
+    }
+
+    public String getFavName() {
+        return favName;
+    }
+
+    public void setFavName(String favName) {
+        this.favName = favName;
     }
 }

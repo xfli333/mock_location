@@ -1,11 +1,15 @@
 package info.ishared.android;
 
 import android.content.Intent;
+import android.provider.Settings;
 import com.google.android.gms.maps.model.LatLng;
 import info.ishared.android.bean.LocationType;
 import info.ishared.android.bean.MockLatLng;
 import info.ishared.android.dao.MockLatLngDao;
 import info.ishared.android.service.MockLocationService;
+import info.ishared.android.util.AlertDialogUtils;
+import info.ishared.android.util.FormatUtils;
+import info.ishared.android.util.ToastUtils;
 
 import java.util.List;
 
@@ -29,21 +33,32 @@ public class MainController {
 
     public void startMockLocation(LatLng latLng) {
         saveOrUpdateCurrentMockLocation(latLng);
-//        Intent intent = new Intent(mainActivity, MockLocationService.class);
-//        Intent intent = new Intent(mainActivity, NewMockLocationService.class);
+        checkMockLocationAndStartMock(latLng);
 //
-//        if (SystemUtils.isServiceWorked(mainActivity, "info.ishared.android.service.MockLocationService")) {
-//            mainActivity.stopService(intent);
-//        }
-//
+    }
 
-
-        mainActivity.startService(new Intent(mainActivity, MockLocationService.class).putExtra("latitude",latLng.latitude).putExtra("longitude",latLng.longitude));
+    private void checkMockLocationAndStartMock(LatLng latLng) {
+        try {
+            int i = Settings.Secure.getInt(mainActivity.getContentResolver(), "mock_location");
+            if (i == 0) {
+                AlertDialogUtils.showYesNoDiaLog(mainActivity, "需要打开允许模拟选项,是否去设置？", new AlertDialogUtils.Executor() {
+                    @Override
+                    public void execute() {
+                        mainActivity.startActivity(new Intent().setClassName("com.android.settings", "com.android.settings.DevelopmentSettings"));
+                    }
+                });
+            } else {
+                mainActivity.startService(new Intent(mainActivity, MockLocationService.class).putExtra("latitude", latLng.latitude).putExtra("longitude", latLng.longitude));
+                ToastUtils.showMessage(mainActivity, "正在模拟位置:" +  FormatUtils.formatLatLngNumber(latLng.latitude) + "," +  FormatUtils.formatLatLngNumber(latLng.longitude));
+                mainActivity.finish();
+            }
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void stopMockLocationService() {
         Intent intent = new Intent(mainActivity, MockLocationService.class);
-//        Intent intent = new Intent(mainActivity, FakeGPSService.class);
         mainActivity.stopService(intent);
     }
 
@@ -53,7 +68,6 @@ public class MainController {
             return new LatLng(mockLatLngList.get(0).getLatitude(), mockLatLngList.get(0).getLongitude());
         }
         return null;
-//        return new LatLng(30.66, 104.07);
     }
 
 
@@ -64,6 +78,7 @@ public class MainController {
             mockLatLng.setLatitude(latLng.latitude);
             mockLatLng.setLongitude(latLng.longitude);
             mockLatLng.setLocationType(LocationType.LAST.name());
+            mockLatLng.setFavName("");
             this.mockLatLngDao.insertCurrentMockLocation(mockLatLng);
         } else {
             MockLatLng mockLatLng = mockLatLngList.get(0);

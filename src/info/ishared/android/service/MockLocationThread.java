@@ -36,13 +36,12 @@ public class MockLocationThread implements Runnable {
         this.locationManager = (LocationManager) paramContext.getSystemService("location");
         loc = new Location(provider);
         try {
-            this.locationManager.addTestProvider("gps", false, false, false, false, false, false, false, 1, 1);
+            this.locationManager.addTestProvider(provider, false, false, false, false, false, false, false, 1, 1);
             this.locationManager.setTestProviderEnabled(provider, true);
             return;
         } catch (IllegalArgumentException localIllegalArgumentException) {
-            Log.d(AppConfig.TAG, "localIllegalArgumentException ......");
             this.locationManager.removeTestProvider(provider);
-            this.locationManager.addTestProvider("gps", false, false, false, false, false, false, false, 1, 1);
+            this.locationManager.addTestProvider(provider, false, false, false, false, false, false, false, 1, 1);
         }
     }
 
@@ -54,14 +53,14 @@ public class MockLocationThread implements Runnable {
 
     public void unRegister() {
         try {
-            this.locationManager.removeTestProvider("gps");
+            this.locationManager.removeTestProvider(provider);
             handler.removeCallbacks(this);
         } catch (Exception localException) {
         }
     }
 
     private void mockLocation() {
-        Log.d(AppConfig.TAG, "mockLocation ......"+this.loc.getLatitude()+","+this.loc.getLongitude());
+//        Log.d(AppConfig.TAG, "mockLocation ......"+this.loc.getLatitude()+","+this.loc.getLongitude());
         this.locationManager.setTestProviderLocation(provider, this.loc);
 
     }
@@ -76,6 +75,7 @@ public class MockLocationThread implements Runnable {
         this.loc.setSpeed(0);
         this.loc.setAccuracy(1);
         this.loc.setTime(System.currentTimeMillis());
+
         this.handler.removeCallbacks(this);
         this.handler.post(this);
     }

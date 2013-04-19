@@ -31,6 +31,7 @@ public class MockLatLngDao {
         values.put(DBConfig.MockLatLng.LATITUDE, mockLatLng.getLatitude());
         values.put(DBConfig.MockLatLng.LONGITUDE, mockLatLng.getLongitude());
         values.put(DBConfig.MockLatLng.LOCATION_TYPE, mockLatLng.getLocationType());
+        values.put(DBConfig.MockLatLng.FAV_NAME, mockLatLng.getFavName());
 
         this.mDBHelper.getMDB().insertOrThrow(DBConfig.MockLatLng.TABLE_NAME, null, values);
         this.mDBHelper.close();
@@ -71,7 +72,7 @@ public class MockLatLngDao {
         builder.appendWhere(whereClause);
         builder.setTables(DBConfig.MockLatLng.TABLE_NAME);
         String arrColumn[] = {
-                DBConfig.MockLatLng.ID, DBConfig.MockLatLng.LATITUDE, DBConfig.MockLatLng.LONGITUDE, DBConfig.MockLatLng.LOCATION_TYPE
+                DBConfig.MockLatLng.ID, DBConfig.MockLatLng.LATITUDE, DBConfig.MockLatLng.LONGITUDE, DBConfig.MockLatLng.LOCATION_TYPE, DBConfig.MockLatLng.FAV_NAME
         };
         Cursor c = builder.query(this.mDBHelper.getMDB(), arrColumn, null, null, null, null, null);
         c.moveToFirst();
@@ -82,6 +83,7 @@ public class MockLatLngDao {
             item.setLatitude(c.getDouble(c.getColumnIndex(arrColumn[1])));
             item.setLongitude(c.getDouble(c.getColumnIndex(arrColumn[2])));
             item.setLocationType(c.getString(c.getColumnIndex(arrColumn[3])));
+            item.setFavName(c.getString(c.getColumnIndex(arrColumn[4])));
             data.add(item);
             c.moveToNext();
         }
