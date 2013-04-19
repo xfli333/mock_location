@@ -62,6 +62,20 @@ public class MainController {
         mainActivity.stopService(intent);
     }
 
+    public void favCurrentLocation(String favName,LatLng latLng){
+        MockLatLng  mockLatLng = new MockLatLng();
+        mockLatLng.setLatitude(latLng.latitude);
+        mockLatLng.setLongitude(latLng.longitude);
+        mockLatLng.setLocationType(LocationType.FAV.name());
+        mockLatLng.setFavName(favName);
+        this.mockLatLngDao.insertCurrentMockLocation(mockLatLng);
+    }
+
+    public List<MockLatLng> getAllFavLocation(){
+        List<MockLatLng> mockLatLngList = this.mockLatLngDao.queryMockLatLngByType(LocationType.FAV);
+        return mockLatLngList;
+    }
+
     public LatLng getLastMockLocation() {
         List<MockLatLng> mockLatLngList = this.mockLatLngDao.queryMockLatLngByType(LocationType.LAST);
         if (!mockLatLngList.isEmpty()) {

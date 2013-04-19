@@ -1,23 +1,14 @@
 package info.ishared.android;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import com.actionbarsherlock.app.SherlockMapActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -27,11 +18,12 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import info.ishared.android.service.MockLocationService;
+import info.ishared.android.bean.MockLatLng;
 import info.ishared.android.util.AlertDialogUtils;
 import info.ishared.android.util.FormatUtils;
-import info.ishared.android.util.SystemUtils;
 import info.ishared.android.util.ToastUtils;
+
+import java.util.List;
 
 public class MainActivity extends SherlockMapActivity {
     /**
@@ -179,10 +171,19 @@ public class MainActivity extends SherlockMapActivity {
                         AlertDialogUtils.showInputDialog(MainActivity.this,previousMarker.getSnippet(), new AlertDialogUtils.CallBack() {
                             @Override
                             public void execute(Object... obj) {
-                                ToastUtils.showMessage(MainActivity.this, obj[0].toString());
+                                mainController.favCurrentLocation(obj[0].toString(),previousMarker.getPosition());
+                                ToastUtils.showMessage(MainActivity.this, "收藏成功");
                             }
                         });
                     }
+                    break;
+                case 2:
+                    List<MockLatLng> favLocationList =mainController.getAllFavLocation();
+                    String txt="";
+                    for(MockLatLng mockLatLng : favLocationList){
+                        txt+=mockLatLng.getFavName();
+                    }
+                    ToastUtils.showMessage(MainActivity.this,txt);
                     break;
                 case 4:
                     mainController.stopMockLocationService();
