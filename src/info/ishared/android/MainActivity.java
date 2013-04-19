@@ -1,14 +1,15 @@
 package info.ishared.android;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.PopupWindow;
+import android.view.ViewGroup;
+import android.widget.*;
 import com.actionbarsherlock.app.SherlockMapActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -23,7 +24,7 @@ import info.ishared.android.util.AlertDialogUtils;
 import info.ishared.android.util.FormatUtils;
 import info.ishared.android.util.ToastUtils;
 
-import java.util.List;
+import java.util.*;
 
 public class MainActivity extends SherlockMapActivity {
     /**
@@ -47,6 +48,10 @@ public class MainActivity extends SherlockMapActivity {
 
     private LatLng defaultLatLng;
 
+    private ListView mFavListView;
+    private Dialog mFavDialog;
+    protected SimpleAdapter adapter;
+    protected List<Map<String, String>> favLocationData = new ArrayList<Map<String, String>>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,12 @@ public class MainActivity extends SherlockMapActivity {
         mainController = new MainController(this);
         mHandler = new Handler();
         defaultLatLng = this.mainController.getLastMockLocation();
+        mFavDialog = new Dialog(MainActivity.this);
+        mFavDialog.setContentView(R.layout.dialog_fav_list_view);
+        mFavDialog.setCancelable(true);
+        mFavDialog.setTitle("收藏列表");
+        mFavListView=(ListView)mFavDialog.findViewById(R.id.fav_location_list_view);
+
         mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         if (defaultLatLng != null) {
             previousMarker = mMap.addMarker(new MarkerOptions().draggable(true).position(defaultLatLng).title("坐标:").snippet(FormatUtils.formatLatLngNumber(defaultLatLng.latitude) + "," + FormatUtils.formatLatLngNumber(defaultLatLng.longitude)));
@@ -155,6 +166,63 @@ public class MainActivity extends SherlockMapActivity {
         }
     }
 
+    private void showFavLocation() {
+
+        initListViewData();
+        initListViewGUI();
+        mFavDialog.show();
+    }
+
+    private void initListViewGUI() {
+        adapter = new SimpleAdapter(this, favLocationData, R.layout.fav_location_list_item, new String[]{"name", "location"}, new int[]{R.id.fav_name, R.id.fav_location}) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                if (position % 2 != 0)
+                    view.setBackgroundResource(R.drawable.table_background_selector);
+                else
+                    view.setBackgroundResource(R.drawable.table_background_alternate_selector);
+                return view;
+            }
+        };
+        mFavListView.setAdapter(adapter);
+        mFavListView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+
+            public void onCreateContextMenu(ContextMenu menu, View v,
+                                            ContextMenu.ContextMenuInfo menuInfo) {
+                menu.add(0, 1, 0, "移到该地点");
+                menu.add(0, 2, 0, "删除该地点");
+
+            }
+        });
+    }
+
+    private void initListViewData() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                favLocationData.clear();
+                List<MockLatLng> favLocationList = mainController.getAllFavLocation();
+                Collections.sort(favLocationList, new Comparator<MockLatLng>() {
+                    @Override
+                    public int compare(MockLatLng lhs, MockLatLng  rhs) {
+                        return lhs.getFavName().compareTo(rhs.getFavName());
+                    }
+                });
+                for (MockLatLng mockLatLng : favLocationList) {
+                    Map<String, String> map = new HashMap<String, String>(2);
+                    map.put("name", mockLatLng.getFavName());
+                    map.put("location", FormatUtils.formatLatLngNumber(mockLatLng.getLatitude()) + "," + FormatUtils.formatLatLngNumber(mockLatLng.getLongitude()));
+                    map.put("latitude",mockLatLng.getLatitude().toString());
+                    map.put("longitude",mockLatLng.getLongitude().toString());
+                    favLocationData.add(map);
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+    }
+
     class MyOnItemClickListener implements AdapterView.OnItemClickListener {
 
         @Override
@@ -168,22 +236,19 @@ public class MainActivity extends SherlockMapActivity {
                     break;
                 case 1:
                     if (previousMarker != null) {
-                        AlertDialogUtils.showInputDialog(MainActivity.this,previousMarker.getSnippet(), new AlertDialogUtils.CallBack() {
+                        AlertDialogUtils.showInputDialog(MainActivity.this, previousMarker.getSnippet(), new AlertDialogUtils.CallBack() {
                             @Override
                             public void execute(Object... obj) {
-                                mainController.favCurrentLocation(obj[0].toString(),previousMarker.getPosition());
+                                mainController.favCurrentLocation(obj[0].toString(), previousMarker.getPosition());
                                 ToastUtils.showMessage(MainActivity.this, "收藏成功");
                             }
                         });
                     }
                     break;
                 case 2:
-                    List<MockLatLng> favLocationList =mainController.getAllFavLocation();
-                    String txt="";
-                    for(MockLatLng mockLatLng : favLocationList){
-                        txt+=mockLatLng.getFavName();
-                    }
-                    ToastUtils.showMessage(MainActivity.this,txt);
+
+                    showFavLocation();
+
                     break;
                 case 4:
                     mainController.stopMockLocationService();
