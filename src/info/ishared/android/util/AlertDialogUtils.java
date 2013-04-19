@@ -3,6 +3,10 @@ package info.ishared.android.util;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.view.LayoutInflater;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import info.ishared.android.R;
 
 /**
  * User: Lee
@@ -13,7 +17,9 @@ public class AlertDialogUtils {
     public interface Executor {
         void execute();
     }
-
+    public interface CallBack{
+        void execute(Object... obj);
+    }
     /**
      * @param context
      * @param message
@@ -42,5 +48,24 @@ public class AlertDialogUtils {
         }).show();
     }
 
+    public static void showInputDialog(Context context, String location, final CallBack executor) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.dialog_input_layout, null);
+        ((EditText)layout.findViewById(R.id.dialog_input_number)).setEnabled(false);
+        ((EditText)layout.findViewById(R.id.dialog_input_number)).setText(location);
+        builder.setView(layout).setCancelable(false).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                String inputName=((EditText)layout.findViewById(R.id.dialog_input_name)).getText().toString();
+                executor.execute(inputName);
+            }
+        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 
 }

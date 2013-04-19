@@ -157,31 +157,38 @@ public class MainActivity extends SherlockMapActivity {
             mPopupWindow.setFocusable(true);
             listView = (ListView) menu_view.findViewById(R.id.lv_dialog);
             listView.setAdapter(new ArrayAdapter<String>(MainActivity.this, R.layout.text, R.id.tv_text, title));
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                @Override
-                public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                    mPopupWindow.dismiss();
-                    mPopupWindow = null;
-
-                    switch (arg2) {
-                        case 0:
-                            mainController.stopMockLocationService();
-                            ToastUtils.showMessage(MainActivity.this, "停止模拟位置");
-                            break;
-                        case 4:
-                            mainController.stopMockLocationService();
-                            MainActivity.this.finish();
-                            break;
-                    }
-
-
-                }
-            });
-
-
+            listView.setOnItemClickListener(new MyOnItemClickListener());
             mPopupWindow.showAsDropDown(view, 10, 0);
+
+        }
+    }
+
+    class MyOnItemClickListener implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            mPopupWindow.dismiss();
+            mPopupWindow = null;
+            switch (position) {
+                case 0:
+                    mainController.stopMockLocationService();
+                    ToastUtils.showMessage(MainActivity.this, "停止模拟位置");
+                    break;
+                case 1:
+                    if (previousMarker != null) {
+                        AlertDialogUtils.showInputDialog(MainActivity.this,previousMarker.getSnippet(), new AlertDialogUtils.CallBack() {
+                            @Override
+                            public void execute(Object... obj) {
+                                ToastUtils.showMessage(MainActivity.this, obj[0].toString());
+                            }
+                        });
+                    }
+                    break;
+                case 4:
+                    mainController.stopMockLocationService();
+                    MainActivity.this.finish();
+                    break;
+            }
 
         }
     }
