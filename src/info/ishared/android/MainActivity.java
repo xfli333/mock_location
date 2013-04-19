@@ -31,6 +31,10 @@ public class MainActivity extends SherlockMapActivity {
      * Called when the activity is first created.
      */
 
+    private static final int MOVE = 0;
+    private static final int DELETE = 1;
+
+
     GoogleMap mMap;
 
     private Marker previousMarker;
@@ -146,6 +150,30 @@ public class MainActivity extends SherlockMapActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    public boolean onContextItemSelected(android.view.MenuItem item) {
+        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        Long id = Long.valueOf(favLocationData.get(menuInfo.position).get("id"));
+        Double latitude =  Double.valueOf(favLocationData.get(menuInfo.position).get("latitude"));
+        Double longitude =  Double.valueOf(favLocationData.get(menuInfo.position).get("longitude"));
+        switch (item.getItemId()) {
+            case MOVE:
+                LatLng latLng =new LatLng(latitude,longitude);
+                previousMarker = mMap.addMarker(new MarkerOptions().draggable(true).position(latLng).title("坐标:").snippet(FormatUtils.formatLatLngNumber(latitude) + "," + FormatUtils.formatLatLngNumber(longitude)));
+                previousMarker.showInfoWindow();
+                break;
+            case DELETE:
+                mainController.deleteFavLocation(id);
+                adapter.notifyDataSetChanged();
+                ToastUtils.showMessage(this,"删除成功");
+                mFavDialog.cancel();
+                break;
+            default:
+                break;
+        }
+
+        return false;
+    }
 
     private void showPopupWindow(View view) {
         if (mPopupWindow != null && mPopupWindow.isShowing()) {
@@ -190,8 +218,8 @@ public class MainActivity extends SherlockMapActivity {
 
             public void onCreateContextMenu(ContextMenu menu, View v,
                                             ContextMenu.ContextMenuInfo menuInfo) {
-                menu.add(0, 1, 0, "移到该地点");
-                menu.add(0, 2, 0, "删除该地点");
+                menu.add(0, MOVE, 0, "移到该地点");
+                menu.add(0, DELETE, 0, "删除该地点");
 
             }
         });
@@ -211,6 +239,7 @@ public class MainActivity extends SherlockMapActivity {
                 });
                 for (MockLatLng mockLatLng : favLocationList) {
                     Map<String, String> map = new HashMap<String, String>(2);
+                    map.put("id", mockLatLng.getId()+"");
                     map.put("name", mockLatLng.getFavName());
                     map.put("location", FormatUtils.formatLatLngNumber(mockLatLng.getLatitude()) + "," + FormatUtils.formatLatLngNumber(mockLatLng.getLongitude()));
                     map.put("latitude",mockLatLng.getLatitude().toString());

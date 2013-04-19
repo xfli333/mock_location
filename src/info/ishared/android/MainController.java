@@ -62,6 +62,10 @@ public class MainController {
         mainActivity.stopService(intent);
     }
 
+    public void deleteFavLocation(Long id){
+        this.mockLatLngDao.deleteMockLocationById(id);
+    }
+
     public void favCurrentLocation(String favName,LatLng latLng){
         MockLatLng  mockLatLng = new MockLatLng();
         mockLatLng.setLatitude(latLng.latitude);

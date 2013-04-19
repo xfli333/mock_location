@@ -92,4 +92,12 @@ public class MockLatLngDao {
         return data;
 
     }
+
+
+    public void deleteMockLocationById(Long id){
+        this.mDBHelper.open();
+        String whereClause=DBConfig.MockLatLng.ID +" = "+id+"";
+        this.mDBHelper.getMDB().delete(DBConfig.MockLatLng.TABLE_NAME,whereClause,null);
+        this.mDBHelper.close();
+    }
 }
