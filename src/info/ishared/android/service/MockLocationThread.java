@@ -14,6 +14,7 @@ import info.ishared.android.bean.MockLatLng;
 import info.ishared.android.dao.MockLatLngDao;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,8 +26,6 @@ public class MockLocationThread implements Runnable {
     private String provider = LocationManager.GPS_PROVIDER;
     private Context context;
     private LocationManager locationManager;
-    private LatLng latLng;
-    private MockLatLngDao mockLatLngDao;
     private Handler handler;
     private Location loc;
 
@@ -35,7 +34,6 @@ public class MockLocationThread implements Runnable {
         this.context = paramContext;
         this.handler = new Handler();
         this.locationManager = (LocationManager) paramContext.getSystemService("location");
-        this.mockLatLngDao = new MockLatLngDao(context);
         loc = new Location(provider);
         try {
             this.locationManager.addTestProvider("gps", false, false, false, false, false, false, false, 1, 1);
@@ -50,8 +48,7 @@ public class MockLocationThread implements Runnable {
 
     @Override
     public void run() {
-
-        mockLocation(this.latLng);
+        mockLocation();
         handler.postDelayed(this, 3000L);
     }
 
@@ -63,38 +60,22 @@ public class MockLocationThread implements Runnable {
         }
     }
 
-    private void mockLocation(LatLng latLng) {
+    private void mockLocation() {
         Log.d(AppConfig.TAG, "mockLocation ......"+this.loc.getLatitude()+","+this.loc.getLongitude());
-
-        Long time = System.currentTimeMillis();
-        this.loc.setTime(time);
-
-//        if (latLng == null) {
-//            Log.d(AppConfig.TAG, "latLng is null");
-//            List<MockLatLng> mockLatLngList = this.mockLatLngDao.queryMockLatLngByType(LocationType.LAST);
-//            if (!mockLatLngList.isEmpty()) {
-//                this.loc.setLatitude(mockLatLngList.get(0).getLatitude());
-//                this.loc.setLongitude(mockLatLngList.get(0).getLongitude());
-//                this.latLng = new LatLng(mockLatLngList.get(0).getLatitude(), mockLatLngList.get(0).getLongitude());
-//            }
-//        } else {
-//            this.loc.setLatitude(latLng.latitude);
-//            this.loc.setLongitude(latLng.longitude);
-//        }
-
-
-//        locationManager.setTestProviderEnabled(provider, true);
-//        locationManager.setTestProviderStatus(provider, LocationProvider.AVAILABLE, null, time);
         this.locationManager.setTestProviderLocation(provider, this.loc);
-//        Settings.Secure.putInt(this.context.getContentResolver(), "mock_location", 1);
 
     }
 
     public void setNewLocation(double paramDouble1, double paramDouble2) {
-        Location localLocation = new Location("gps");
-        localLocation.setLongitude(paramDouble2);
-        localLocation.setLatitude(paramDouble1);
-        this.loc = localLocation;
+        this.loc = new Location(provider);
+        this.loc.setLongitude(paramDouble2);
+        this.loc.setLatitude(paramDouble1);
+
+        this.loc.setAltitude(65);
+        this.loc.setBearing(0);
+        this.loc.setSpeed(0);
+        this.loc.setAccuracy(1);
+        this.loc.setTime(System.currentTimeMillis());
         this.handler.removeCallbacks(this);
         this.handler.post(this);
     }

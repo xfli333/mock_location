@@ -1,18 +1,13 @@
 package info.ishared.android;
 
 import android.content.Intent;
-import android.location.LocationManager;
-import android.os.Bundle;
 import com.google.android.gms.maps.model.LatLng;
 import info.ishared.android.bean.LocationType;
 import info.ishared.android.bean.MockLatLng;
 import info.ishared.android.dao.MockLatLngDao;
 import info.ishared.android.service.MockLocationService;
-import info.ishared.android.service.NewMockLocationService;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created with IntelliJ IDEA.
