@@ -49,6 +49,7 @@ public class MainActivity extends SherlockMapActivity {
     private LatLng defaultLatLng;
 
     private FavDialog mFavDialog;
+    private HelpDialog mHelpDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -163,6 +164,12 @@ public class MainActivity extends SherlockMapActivity {
         mFavDialog.show();
     }
 
+    private void showHelpDialog(){
+        mHelpDialog = new HelpDialog(this);
+        mHelpDialog.show();
+    }
+
+
     public void moveToLocation(LatLng latLng) {
         this.previousMarker.remove();
 
@@ -196,9 +203,10 @@ public class MainActivity extends SherlockMapActivity {
                     }
                     break;
                 case 2:
-
                     showFavLocation();
-
+                    break;
+                case 3:
+                    showHelpDialog();
                     break;
                 case 4:
                     mainController.stopMockLocationService();
