@@ -209,8 +209,13 @@ public class MainActivity extends SherlockMapActivity {
                     showHelpDialog();
                     break;
                 case 4:
-                    mainController.stopMockLocationService();
-                    MainActivity.this.finish();
+                    AlertDialogUtils.showYesNoDiaLog(MainActivity.this,"停止模拟并退出程序?",new AlertDialogUtils.Executor() {
+                        @Override
+                        public void execute() {
+                            mainController.stopMockLocationService();
+                            MainActivity.this.finish();
+                        }
+                    });
                     break;
             }
 

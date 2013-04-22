@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import com.google.android.gms.maps.model.LatLng;
 import info.ishared.android.bean.MockLatLng;
+import info.ishared.android.util.AlertDialogUtils;
 import info.ishared.android.util.FormatUtils;
 
 import java.util.*;
@@ -60,8 +61,8 @@ public class FavDialog extends Dialog {
         mFavListView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-                menu.add(0,MOVE,0,"移动到该位置");
-                menu.add(0,DELETE,0,"删除该位置");
+                menu.add(0, MOVE, 0, "移动到该位置");
+                menu.add(0, DELETE, 0, "删除该位置");
             }
         });
 
@@ -72,18 +73,24 @@ public class FavDialog extends Dialog {
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        Long id = Long.valueOf(favLocationData.get(menuInfo.position).get("id"));
-        Double latitude =  Double.valueOf(favLocationData.get(menuInfo.position).get("latitude"));
-        Double longitude =  Double.valueOf(favLocationData.get(menuInfo.position).get("longitude"));
+        final Long id = Long.valueOf(favLocationData.get(menuInfo.position).get("id"));
+        Double latitude = Double.valueOf(favLocationData.get(menuInfo.position).get("latitude"));
+        Double longitude = Double.valueOf(favLocationData.get(menuInfo.position).get("longitude"));
         LatLng latLng = new LatLng(latitude, longitude);
         switch (item.getItemId()) {
             case MOVE:
                 mainActivity.moveToLocation(latLng);
                 break;
             case DELETE:
-                mainActivity.mainController.deleteFavLocation(id);
-                adapter.notifyDataSetChanged();
-                this.dismiss();
+                AlertDialogUtils.showYesNoDiaLog(mainActivity, "删除收藏?", new AlertDialogUtils.Executor() {
+                    @Override
+                    public void execute() {
+                        mainActivity.mainController.deleteFavLocation(id);
+                        adapter.notifyDataSetChanged();
+                        FavDialog.this.dismiss();
+                    }
+                });
+
                 break;
             default:
                 break;
