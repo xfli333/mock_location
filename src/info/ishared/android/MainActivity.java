@@ -31,13 +31,9 @@ public class MainActivity extends SherlockMapActivity {
      * Called when the activity is first created.
      */
 
-    private static final int MOVE = 0;
-    private static final int DELETE = 1;
-
-
     GoogleMap mMap;
 
-    private Marker previousMarker;
+    public Marker previousMarker;
 
     private Handler mHandler;
 
@@ -52,10 +48,7 @@ public class MainActivity extends SherlockMapActivity {
 
     private LatLng defaultLatLng;
 
-    private ListView mFavListView;
-    private Dialog mFavDialog;
-    protected SimpleAdapter adapter;
-    protected List<Map<String, String>> favLocationData = new ArrayList<Map<String, String>>();
+    private FavDialog mFavDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,11 +57,7 @@ public class MainActivity extends SherlockMapActivity {
         mainController = new MainController(this);
         mHandler = new Handler();
         defaultLatLng = this.mainController.getLastMockLocation();
-        mFavDialog = new Dialog(MainActivity.this);
-        mFavDialog.setContentView(R.layout.dialog_fav_list_view);
-        mFavDialog.setCancelable(true);
-        mFavDialog.setTitle("收藏列表");
-        mFavListView=(ListView)mFavDialog.findViewById(R.id.fav_location_list_view);
+
 
         mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         if (defaultLatLng != null) {
@@ -150,31 +139,6 @@ public class MainActivity extends SherlockMapActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onContextItemSelected(android.view.MenuItem item) {
-        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        Long id = Long.valueOf(favLocationData.get(menuInfo.position).get("id"));
-        Double latitude =  Double.valueOf(favLocationData.get(menuInfo.position).get("latitude"));
-        Double longitude =  Double.valueOf(favLocationData.get(menuInfo.position).get("longitude"));
-        switch (item.getItemId()) {
-            case MOVE:
-                LatLng latLng =new LatLng(latitude,longitude);
-                previousMarker = mMap.addMarker(new MarkerOptions().draggable(true).position(latLng).title("坐标:").snippet(FormatUtils.formatLatLngNumber(latitude) + "," + FormatUtils.formatLatLngNumber(longitude)));
-                previousMarker.showInfoWindow();
-                break;
-            case DELETE:
-                mainController.deleteFavLocation(id);
-                adapter.notifyDataSetChanged();
-                ToastUtils.showMessage(this,"删除成功");
-                mFavDialog.cancel();
-                break;
-            default:
-                break;
-        }
-
-        return false;
-    }
-
     private void showPopupWindow(View view) {
         if (mPopupWindow != null && mPopupWindow.isShowing()) {
             mPopupWindow.dismiss();
@@ -195,62 +159,19 @@ public class MainActivity extends SherlockMapActivity {
     }
 
     private void showFavLocation() {
-
-        initListViewData();
-        initListViewGUI();
+        mFavDialog = new FavDialog(this, this);
         mFavDialog.show();
     }
 
-    private void initListViewGUI() {
-        adapter = new SimpleAdapter(this, favLocationData, R.layout.fav_location_list_item, new String[]{"name", "location"}, new int[]{R.id.fav_name, R.id.fav_location}) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                if (position % 2 != 0)
-                    view.setBackgroundResource(R.drawable.table_background_selector);
-                else
-                    view.setBackgroundResource(R.drawable.table_background_alternate_selector);
-                return view;
-            }
-        };
-        mFavListView.setAdapter(adapter);
-        mFavListView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+    public void moveToLocation(LatLng latLng) {
+        this.previousMarker.remove();
 
-            public void onCreateContextMenu(ContextMenu menu, View v,
-                                            ContextMenu.ContextMenuInfo menuInfo) {
-                menu.add(0, MOVE, 0, "移到该地点");
-                menu.add(0, DELETE, 0, "删除该地点");
-
-            }
-        });
+        this.mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6));
+        this.previousMarker = this.mMap.addMarker(new MarkerOptions().draggable(true).position(latLng).title("坐标:").snippet(FormatUtils.formatLatLngNumber(latLng.latitude) + "," + FormatUtils.formatLatLngNumber(latLng.longitude)));
+        this.previousMarker.showInfoWindow();
+        mFavDialog.dismiss();
     }
 
-    private void initListViewData() {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                favLocationData.clear();
-                List<MockLatLng> favLocationList = mainController.getAllFavLocation();
-                Collections.sort(favLocationList, new Comparator<MockLatLng>() {
-                    @Override
-                    public int compare(MockLatLng lhs, MockLatLng  rhs) {
-                        return lhs.getFavName().compareTo(rhs.getFavName());
-                    }
-                });
-                for (MockLatLng mockLatLng : favLocationList) {
-                    Map<String, String> map = new HashMap<String, String>(2);
-                    map.put("id", mockLatLng.getId()+"");
-                    map.put("name", mockLatLng.getFavName());
-                    map.put("location", FormatUtils.formatLatLngNumber(mockLatLng.getLatitude()) + "," + FormatUtils.formatLatLngNumber(mockLatLng.getLongitude()));
-                    map.put("latitude",mockLatLng.getLatitude().toString());
-                    map.put("longitude",mockLatLng.getLongitude().toString());
-                    favLocationData.add(map);
-                }
-                adapter.notifyDataSetChanged();
-            }
-        });
-
-    }
 
     class MyOnItemClickListener implements AdapterView.OnItemClickListener {
 
