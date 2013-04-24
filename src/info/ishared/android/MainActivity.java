@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import info.ishared.android.bean.MockLatLng;
 import info.ishared.android.util.AlertDialogUtils;
 import info.ishared.android.util.FormatUtils;
+import info.ishared.android.util.SystemUtils;
 import info.ishared.android.util.ToastUtils;
 
 import java.util.*;
@@ -54,7 +55,16 @@ public class MainActivity extends SherlockMapActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(!SystemUtils.checkIsInstallGoogleMap(this)){
+            AlertDialogUtils.showConfirmDiaLog(this,"本软件需要Google Map支持,请先安装Google Map",new AlertDialogUtils.Executor() {
+                @Override
+                public void execute() {
+                    finish();
+                }
+            });
+        }
         setContentView(R.layout.main);
+
         mainController = new MainController(this);
         mHandler = new Handler();
         defaultLatLng = this.mainController.getLastMockLocation();

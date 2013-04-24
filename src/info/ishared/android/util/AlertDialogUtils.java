@@ -48,6 +48,16 @@ public class AlertDialogUtils {
         }).show();
     }
 
+    public static void showConfirmDiaLog(Context context, String message,final Executor executor) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(message).setCancelable(true).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+                executor.execute();
+            }
+        }).show();
+    }
+
     public static void showInputDialog(Context context, String location, final CallBack executor) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

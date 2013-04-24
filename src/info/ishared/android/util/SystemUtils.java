@@ -2,8 +2,10 @@ package info.ishared.android.util;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,5 +28,22 @@ public class SystemUtils {
             }
         }
         return false;
+    }
+
+
+    public static boolean checkIsInstallGoogleMap(Context context) {
+        boolean isInstallGMap = false;
+        List<PackageInfo> packs = context.getPackageManager().getInstalledPackages(0);
+        for (int i = 0; i < packs.size(); i++) {
+            PackageInfo p = packs.get(i);
+            if (p.versionName == null) { // system packages
+                continue;
+            }
+            if ("com.google.android.apps.maps".equals(p.packageName)) {
+                isInstallGMap = true;
+                break;
+            }
+        }
+        return isInstallGMap;
     }
 }
