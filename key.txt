@@ -25,3 +25,5 @@ Certificate fingerprints:
 
 
 AIzaSyCvqytrO2DZpoFZFHGQYR2ZdL9rl_vMj00
+
+baidu map key: 95ECA0FFB3FEF3DB9ACBCEC8AF5DE12ADC4F4CDE
